@@ -72,7 +72,8 @@ int main(int argc, char *argv[]) {
   struct sockaddr saddr_dst = {0};
 
 
-  char is_printed[65535 + 1] = {0};
+  char is_printed[8192] = {0};
+  unsigned short recv_source_port;
 
   while (1) {
 
@@ -106,12 +107,17 @@ int main(int argc, char *argv[]) {
         if (recv_tcp->dest == htons(SOURCE_PORT) &&
             recv_tcp->syn == 1 && // syn - synchronize, ack - succes got packet,
             recv_tcp->ack == 1 && recv_ip->saddr == ip->daddr &&
-            recv_ip->protocol == IPPROTO_TCP
+            recv_ip->protocol == IPPROTO_TCP)
 
-        ) { // their size is 1 bit
-          if (is_printed[ntohs(recv_tcp->source)] != 1) {
+         {
+          // their size is 1 bit
+          recv_source_port = ntohs(recv_tcp->source);
+
+          if (!( is_printed[recv_source_port/8] & 1U<< (recv_source_port % 8) )) { //1U looks like 10
+
             printf("port %d is open\n", ntohs(recv_tcp->source));
-            is_printed[ntohs(recv_tcp->source)] = 1;
+            is_printed[recv_source_port/8] |=  1U<< (recv_source_port % 8);
+
           }
         }
 
