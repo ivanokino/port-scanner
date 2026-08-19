@@ -25,10 +25,15 @@ int main(int argc, char *argv[]) {
   char *dst_ip = argv[1];
 
   char buff[4096] = {0};
+  unsigned short start_port, end_port;
 
-  unsigned short start_port = (unsigned short)strtol(argv[2], NULL, 10);
-  unsigned short end_port = (unsigned short)strtol(argv[3], NULL, 10);
-
+  if(!(strcmp((char *)(argv[2]), "-a"))){
+    start_port =1;
+    end_port = 65535;
+}else{
+   start_port = (unsigned short)strtol(argv[2], NULL, 10);
+   end_port = (unsigned short)strtol(argv[3], NULL, 10);
+  }
   // struct timespec ts = {0};
   // ts.tv_nsec = 100000000;
 
@@ -45,6 +50,7 @@ int main(int argc, char *argv[]) {
 
   int one = 1;
   int bs = 100 * 1024 * 1024; // big buffer
+
   setsockopt(sock_fd, IPPROTO_IP, IP_HDRINCL, &one, sizeof(int));
   setsockopt(sock_fd, SOL_SOCKET, SO_RCVBUF, &bs, sizeof(bs));
 
